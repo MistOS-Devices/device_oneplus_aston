@@ -23,7 +23,6 @@ PRODUCT_COPY_FILES += \
 
 # Device-specific settings
 PRODUCT_PACKAGES += \
-    OnePlusParts \
     OPlusExtras
 
 PRODUCT_SYSTEM_PROPERTIES += \
