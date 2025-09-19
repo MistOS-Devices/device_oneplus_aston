@@ -29,3 +29,18 @@ PRODUCT_BUILD_PROP_OVERRIDES += \
     DeviceProduct=CPH2609 \
     SystemDevice=OP5D35L1 \
     SystemName=CPH2609
+
+# Face Unlock
+TARGET_FACE_UNLOCK := true
+# Blur
+TARGET_ENABLE_BLUR := true
+# BCR (Call recording)
+TARGET_PREBUILT_BCR := true
+# Mist OS Flags
+MIST_BUILD_TYPE := OFFICIAL
+MISTOS_MAINTAINER := weaponmasterjax
+WITH_GMS := true
+TARGET_USES_PICO_GAPPS := true
+PRODUCT_NO_CAMERA := false
+TARGET_SUPPORTS_QUICK_TAP := true
+BYPASS_CHARGE_SUPPORTED := true
