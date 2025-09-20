@@ -312,4 +312,7 @@
          fp screen off unlock-->
     <bool name="config_screen_off_udfps_default_on">false</bool>
 
+    <!-- PowerOffAlarmService -->
+    <bool name="config_powerOffAlarmEnabled">true</bool>
+
 </resources>
