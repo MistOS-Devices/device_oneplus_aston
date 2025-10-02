@@ -1243,6 +1243,9 @@ odm/firmware/fastchg/charge_time_config.csv
 odm/firmware/fastchg/charging_thermal_config_default.txt
 odm/firmware/fastchg/smart_chg_config_table.txt
 
+# ConsumerIR
+my_product/del-app/ConsumerIRApp/ConsumerIRApp.apk:product/app/ConsumerIRApp/ConsumerIRApp.apk;PRESIGNED
+
 # Display (Pixelworks)
 odm/etc/inparm/iris7_AA551_P_3_A0004_dsc_cmd_mode_panel/inParm14.txt
 odm/etc/inparm/iris7_AA551_P_3_A0004_dsc_cmd_mode_panel/inParm17.txt
