@@ -61,10 +61,12 @@ public class OPlusExtras extends PreferenceFragment
     public static final String KEY_PER_APP_COLORSPACE = "per_app_colorspace";
     public static final String KEY_PER_APP_REFRESH_RATE = "per_app_refresh_rate";
     public static final String KEY_DC_SWITCH = "dc";
+    public static final String KEY_onepulse_pwm_SWITCH = "onepulse_pwm";
     public static final String KEY_AUTO_HBM_SWITCH = "auto_hbm";
     public static final String KEY_AUTO_HBM_THRESHOLD = "auto_hbm_threshold";
     public static final String KEY_HBM_INFO = "hbm_info";
     private static TwoStatePreference mDCModeSwitch;
+    private static TwoStatePreference mOnePulsePWMSwitch;
     private static TwoStatePreference mAutoHBMSwitch;
     private Preference mHBMInfo;
 
@@ -172,6 +174,17 @@ public class OPlusExtras extends PreferenceFragment
         else {
             findPreference(KEY_DC_SWITCH).setVisible(false);
         }
+
+            // One Pulse PWM
+            displayCategory = displayCategory | isFeatureSupported(context, R.bool.config_deviceSupportsOnePulsePWM);
+            if (isFeatureSupported(context, R.bool.config_deviceSupportsOnePulsePWM)) {
+                mOnePulsePWMSwitch = (TwoStatePreference) findPreference(KEY_onepulse_pwm_SWITCH);
+                mOnePulsePWMSwitch.setEnabled(org.lineageos.settings.modeswitch.OnePulsePWMSwitch.isSupported(this.getContext()));
+                mOnePulsePWMSwitch.setChecked(org.lineageos.settings.modeswitch.OnePulsePWMSwitch.isCurrentlyEnabled(this.getContext()));
+                mOnePulsePWMSwitch.setOnPreferenceChangeListener(new org.lineageos.settings.modeswitch.OnePulsePWMSwitch());
+            } else {
+                findPreference(KEY_onepulse_pwm_SWITCH).setVisible(false);
+            }
 
         // AutoHBM
         displayCategory = displayCategory | isFeatureSupported(context, R.bool.config_deviceSupportsHBM);

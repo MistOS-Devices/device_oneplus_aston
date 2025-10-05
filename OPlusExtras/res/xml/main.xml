@@ -88,6 +88,11 @@
             android:summary="@string/dc_mode_summary" />
 
         <SwitchPreferenceCompat
+            android:key="onepulse_pwm"
+            android:title="@string/onepulse_pwm_mode_title"
+            android:summary="@string/onepulse_pwm_mode_summary" />
+
+        <SwitchPreferenceCompat
             android:key="auto_hbm"
             android:title="@string/auto_hbm_title"
             android:summary="@string/auto_hbm_summary" />
