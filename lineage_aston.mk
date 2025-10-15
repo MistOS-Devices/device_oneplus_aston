@@ -45,13 +45,3 @@ TARGET_USES_PICO_GAPPS := false
 PRODUCT_NO_CAMERA := false
 TARGET_SUPPORTS_QUICK_TAP := true
 BYPASS_CHARGE_SUPPORTED := true
-
-PRODUCT_SYSTEM_PROPERTIES += \
-    ro.mist.display="1264 x 2780, 120 hz" \
-    ro.mist.battery="5500mah" \
-    ro.mist.soc="Snapdragon® 8 Gen 2" \
-    ro.mist.camera="50MP + 8MP + 2MP" \
-    ro.mist.front="16MP" \
-    ro.mist.platform="SM8550-AB" \
-    ro.mist.screen="6.78' LTPO4 AMOLED" \
-    ro.mist.device.name="OnePlus 12R"
