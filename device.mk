@@ -45,6 +45,7 @@ TARGET_HAS_UDFPS := true
 
 # LiveDisplay
 $(call soong_config_set,OPLUS_LINEAGE_LIVEDISPLAY_HAL,ENABLE_AF,false)
+$(call soong_config_set,OPLUS_LINEAGE_LIVEDISPLAY_HAL,ENABLE_SE,false)
 
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
