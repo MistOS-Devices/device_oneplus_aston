@@ -12,7 +12,7 @@
     <bool name="config_deviceSupportsPerAppColorSpace">false</bool>
 
     <!-- Whether device supports Per-App Refresh Rate -->
-    <bool name="config_deviceSupportsPerAppRefreshRate">true</bool>
+    <bool name="config_deviceSupportsPerAppRefreshRate">false</bool>
 
     <!-- Whether device supports DC-dimming -->
     <bool name="config_deviceSupportsDCdimming">false</bool>
