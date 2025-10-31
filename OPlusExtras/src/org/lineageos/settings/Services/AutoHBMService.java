@@ -41,10 +41,6 @@ public class AutoHBMService extends Service {
     private static final String PREF_SAVED_MIN_RATE = "pref_saved_min_rate";
     private static final String PREF_SAVED_PEAK_RATE = "pref_saved_peak_rate";
     private static final String PREF_HAS_SAVED_RATES = "pref_has_saved_rates";
-    private static final String PREF_SAVED_ONEPULSE = "pref_saved_onepulse";
-    private static final String PREF_HAS_SAVED_ONEPULSE = "pref_has_saved_onepulse";
-    private static final String PREF_SAVED_ONEPULSE_ENABLED = "pref_saved_onepulse_enabled";
-    private static final String PREF_HAS_SAVED_ONEPULSE_ENABLED = "pref_has_saved_onepulse_enabled";
     private static final String PREF_SAVED_BRIGHTNESS_MODE = "pref_saved_brightness_mode";
     private static final String PREF_HAS_SAVED_BRIGHTNESS_MODE = "pref_has_saved_brightness_mode";
 
@@ -92,40 +88,6 @@ public class AutoHBMService extends Service {
                 // Disable PWM onepulse trigger first and save previous state
                 String onepulseFile = getApplicationContext().getString(R.string.node_onepulse_pwm_switch);
                 if (onepulseFile != null && FileUtils.fileWritable(onepulseFile)) {
-                    boolean hasSavedOne = mSharedPrefs.getBoolean(PREF_HAS_SAVED_ONEPULSE, false);
-                    if (!hasSavedOne) {
-                        String curOne = FileUtils.readOneLine(onepulseFile);
-                        mSharedPrefs.edit()
-                                .putString(PREF_SAVED_ONEPULSE, curOne)
-                                .putBoolean(PREF_HAS_SAVED_ONEPULSE, true)
-                                .apply();
-                        Log.d(TAG, "Saved PWM OnePulse state=" + curOne);
-                    }
-                    // Disable the OnePulse PWM preference in the UI (grey it out)
-                    try {
-                        boolean hasSavedOneEnabled = mSharedPrefs.getBoolean(PREF_HAS_SAVED_ONEPULSE_ENABLED, false);
-                        if (!hasSavedOneEnabled) {
-                            Handler h = new Handler(Looper.getMainLooper());
-                            h.post(() -> {
-                                try {
-                                    if (org.lineageos.settings.OPlusExtras.mOnePulsePWMSwitch != null) {
-                                        boolean enabled = org.lineageos.settings.OPlusExtras.mOnePulsePWMSwitch.isEnabled();
-                                        org.lineageos.settings.OPlusExtras.mOnePulsePWMSwitch.setChecked(false);
-                                        mSharedPrefs.edit()
-                                                .putBoolean(PREF_SAVED_ONEPULSE_ENABLED, enabled)
-                                                .putBoolean(PREF_HAS_SAVED_ONEPULSE_ENABLED, true)
-                                                .apply();
-                                        org.lineageos.settings.OPlusExtras.mOnePulsePWMSwitch.setEnabled(false);
-                                        Log.d(TAG, "PWM OnePulse preference disabled in UI");
-                                    }
-                                } catch (Exception ex) {
-                                    // ignore
-                                }
-                            });
-                        }
-                    } catch (Exception e) {
-                        // ignore
-                    }
                     String oneFalse = getApplicationContext().getString(R.string.node_onepulse_pwm_switch_false);
                     Log.d(TAG, "Disabling PWM OnePulse: writing " + oneFalse + " to " + onepulseFile);
                     FileUtils.writeValue(onepulseFile, oneFalse);
@@ -164,28 +126,6 @@ public class AutoHBMService extends Service {
                     Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, savedMode);
                     mSharedPrefs.edit().putBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false).apply();
                     Log.d(TAG, "Restored automatic brightness mode=" + savedMode);
-                }
-
-                // Restore the OnePulse PWM preference UI state if we saved it
-                try {
-                    boolean hasSavedOneEnabled = mSharedPrefs.getBoolean(PREF_HAS_SAVED_ONEPULSE_ENABLED, false);
-                    if (hasSavedOneEnabled) {
-                        boolean savedEnabled = mSharedPrefs.getBoolean(PREF_SAVED_ONEPULSE_ENABLED, false);
-                        Handler h = new Handler(Looper.getMainLooper());
-                        h.post(() -> {
-                            try {
-                                if (org.lineageos.settings.OPlusExtras.mOnePulsePWMSwitch != null) {
-                                    org.lineageos.settings.OPlusExtras.mOnePulsePWMSwitch.setEnabled(savedEnabled);
-                                    Log.d(TAG, "Restored OnePulse preference UI enabled=" + savedEnabled);
-                                }
-                            } catch (Exception ex) {
-                                // ignore
-                            }
-                        });
-                        mSharedPrefs.edit().putBoolean(PREF_HAS_SAVED_ONEPULSE_ENABLED, false).apply();
-                    }
-                } catch (Exception e) {
-                    // ignore
                 }
 
                 // Restore previously saved min/peak refresh rates if we saved them
@@ -249,8 +189,10 @@ public class AutoHBMService extends Service {
                 activateLightSensorRead();
             } else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
                 // disable HBM immediately when screen turns off (user locking)
-                enableHBM(false);
-                deactivateLightSensorRead();
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    enableHBM(false);
+                    deactivateLightSensorRead();
+                }, 300);
             }
         }
     };

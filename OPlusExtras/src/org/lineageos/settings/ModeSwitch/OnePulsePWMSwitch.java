@@ -7,7 +7,11 @@
 package org.lineageos.settings.modeswitch;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.util.Log;
 import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 import androidx.preference.Preference.OnPreferenceChangeListener;
 
 import org.lineageos.settings.FileUtils;
@@ -15,6 +19,7 @@ import org.lineageos.settings.R;
 import android.os.Handler;
 import android.os.Looper;
 import org.lineageos.settings.OPlusExtras;
+import org.lineageos.settings.services.AutoHBMService;
 
 public class OnePulsePWMSwitch implements OnPreferenceChangeListener {
 
@@ -41,13 +46,24 @@ public class OnePulsePWMSwitch implements OnPreferenceChangeListener {
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         Boolean enabled = (Boolean) newValue;
+        Context context = preference.getContext();
         FileUtils.writeValue(getFile(preference.getContext()), enabled ? "1" : "0");
-        Handler h = new Handler(Looper.getMainLooper());
-        h.post(() -> {
-            if (OPlusExtras.mAutoHBMSwitch != null) {
-                OPlusExtras.mAutoHBMSwitch.setChecked(!enabled);
+        if (enabled) {
+            Handler h = new Handler(Looper.getMainLooper());
+            h.post(() -> {
+                if (OPlusExtras.mAutoHBMSwitch != null && OPlusExtras.mAutoHBMSwitch.isChecked()) {
+                Log.d("OnePulsePWMSwitch", "Disabling AutoHBM because OnePulse is being enabled.");
+
+                OPlusExtras.mAutoHBMSwitch.setChecked(false);
+
+                SharedPreferences.Editor prefChange = PreferenceManager.getDefaultSharedPreferences(context).edit();
+                prefChange.putBoolean(OPlusExtras.KEY_AUTO_HBM_SWITCH, false).commit();
+
+                Intent intent = new Intent(context, AutoHBMService.class);
+                context.stopService(intent);
             }
-        });
+            });
+        }
         return true;
     }
 }

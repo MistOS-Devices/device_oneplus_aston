@@ -495,9 +495,34 @@ public class OPlusExtras extends PreferenceFragment
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         if (preference == mAutoHBMSwitch) {
             Boolean enabled = (Boolean) newValue;
+
             SharedPreferences.Editor prefChange = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
             prefChange.putBoolean(KEY_AUTO_HBM_SWITCH, enabled).commit();
-            FileUtils.enableService(getContext());
+
+            Intent intent = new Intent(getContext(), AutoHBMService.class);
+            if (enabled) {
+                Log.d(TAG, "Starting AutoHBMService via toggle");
+                getContext().startService(intent);
+            } else {
+                Log.d(TAG, "Stopping AutoHBMService via toggle");
+                getContext().stopService(intent);
+            }
+
+            if (enabled) {
+                if (mOnePulsePWMSwitch != null && mOnePulsePWMSwitch.isChecked()) {
+                    
+                    Log.d(TAG, "Disabling mOnePulsePWMSwitch because HBM is being enabled.");
+
+                    mOnePulsePWMSwitch.setChecked(false);
+                    
+                    String onepulseFile = getContext().getString(R.string.node_onepulse_pwm_switch);
+                    String oneFalse = getContext().getString(R.string.node_onepulse_pwm_switch_false);
+                    
+                    if (onepulseFile != null && FileUtils.fileWritable(onepulseFile)) {
+                        FileUtils.writeValue(onepulseFile, oneFalse);
+                    }
+                }
+            }
             return true;
         } else if (preference == mFpsInfo) {
             boolean enabled = (Boolean) newValue;
