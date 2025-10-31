@@ -19,12 +19,14 @@ import android.content.res.Resources;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.animation.AccelerateInterpolator;
+import android.widget.Toast;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
@@ -37,6 +39,7 @@ import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.TwoStatePreference;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Random;
 
 import com.plattysoft.leonids.ParticleSystem;
@@ -69,6 +72,9 @@ public class OPlusExtras extends PreferenceFragment
     public static TwoStatePreference mOnePulsePWMSwitch;
     public static TwoStatePreference mAutoHBMSwitch;
     private Preference mHBMInfo;
+    private int mHBMInfoClickCount = 0;
+    private long mLastHBMInfoClickTime = 0;
+    private static final int EASTER_EGG_CLICK_COUNT = 6;
 
     public static final String KEY_CATEGORY_CPU = "cpu";
     public static final String KEY_POWER_EFFICIENT_WQ_SWITCH = "power_efficient_workqueue";
@@ -197,26 +203,51 @@ public class OPlusExtras extends PreferenceFragment
             mHBMInfo = (Preference)findPreference(KEY_HBM_INFO);
             mHBMInfo.setOnPreferenceClickListener(preference -> {
 
-                Random rand =new Random();
-                int firstRandom = rand.nextInt(91-0);
-                int secondRandom = rand.nextInt(181-90)+90;
-                int thirdRandom = rand.nextInt(181-0);
+                long now = System.currentTimeMillis();
 
-                Drawable evo = getResources().getDrawable(R.drawable.evo,null);
-                int randomColor;
-                randomColor = Color.rgb(
-                Color.red(rand.nextInt(0xFFFFFF)),
-                Color.green(rand.nextInt(0xFFFFFF)),
-                Color.blue(rand.nextInt(0xFFFFFF)));
-                evo.setTint(randomColor);
+                // Reset counter after timeout
+                if (now - mLastHBMInfoClickTime > 2000) {
+                    mHBMInfoClickCount = 0;
+                }
 
-                ParticleSystem ps = new ParticleSystem(getActivity(),50,evo,2000);
-                ps.setScaleRange(0.7f,1.3f);
-                ps.setSpeedRange(0.1f,0.25f);
-                ps.setAcceleration(0.0001f,thirdRandom);
-                ps.setRotationSpeedRange(firstRandom,secondRandom);
-                ps.setFadeOut(300);
-                ps.oneShot(this.getView(),50);
+                mHBMInfoClickCount++;
+                mLastHBMInfoClickTime = now;
+
+                if (mHBMInfoClickCount == EASTER_EGG_CLICK_COUNT) {
+                    Log.d(TAG, "Easter egg triggered!");
+                    String url;
+                    String toastText;
+                    String language = Locale.getDefault().getLanguage();
+                    if ("zh".equals(language)) {
+                        url = "https://www.bilibili.com/video/BV1GJ411x7h7/";
+                        toastText = "你被骗了！";
+                    } else {
+                        url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+                        toastText = "Never gonna give you up!";
+                    }
+
+                    Toast.makeText(getContext(), toastText, Toast.LENGTH_LONG).show();
+                    Intent rickRollIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    
+                    try {
+                        if (rickRollIntent.resolveActivity(getContext().getPackageManager()) != null) {
+                            getContext().startActivity(rickRollIntent);
+                        } else {
+                            Log.e(TAG, "No activity found to handle ACTION_VIEW for YouTube URL");
+                            Toast.makeText(getContext(), "Couldn't open browser!", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to launch Rick Roll", e);
+                        Toast.makeText(getContext(), "Oops, something went wrong!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    // Reset counter
+                    mHBMInfoClickCount = 0;
+
+                } else if (mHBMInfoClickCount > (EASTER_EGG_CLICK_COUNT - 4)) {
+                    int clicksLeft = EASTER_EGG_CLICK_COUNT - mHBMInfoClickCount;
+                    Toast.makeText(getContext(), clicksLeft + "...", Toast.LENGTH_SHORT).show();
+                }
 
                 return true;
             });
