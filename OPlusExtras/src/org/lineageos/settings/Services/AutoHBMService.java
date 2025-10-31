@@ -69,81 +69,77 @@ public class AutoHBMService extends Service {
     }
 
     private void enableHBM(boolean enable) {
-        if (enable) {
-            Log.d(TAG, "Enabling HBM: writing node 1 to " + getFile());
-            FileUtils.writeValue(getFile(), "1");
-            try {
-                // Disable automatic brightness if enabled and save previous mode
-                int mode = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                boolean hasSavedMode = mSharedPrefs.getBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false);
-                if (!hasSavedMode && mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
-                    mSharedPrefs.edit()
-                            .putInt(PREF_SAVED_BRIGHTNESS_MODE, mode)
-                            .putBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, true)
-                            .apply();
-                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                    Log.d(TAG, "Disabled automatic brightness mode for HBM");
-                }
+        submit(() -> {
+            if (enable) {
+                try {
+                    int mode = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                    boolean hasSavedMode = mSharedPrefs.getBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false);
+                    if (!hasSavedMode && mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC) {
+                        mSharedPrefs.edit()
+                                .putInt(PREF_SAVED_BRIGHTNESS_MODE, mode)
+                                .putBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, true)
+                                .apply();
+                        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                        Log.d(TAG, "Disabled automatic brightness mode for HBM");
+                    }
 
-                // Disable PWM onepulse trigger first and save previous state
-                String onepulseFile = getApplicationContext().getString(R.string.node_onepulse_pwm_switch);
-                if (onepulseFile != null && FileUtils.fileWritable(onepulseFile)) {
-                    String oneFalse = getApplicationContext().getString(R.string.node_onepulse_pwm_switch_false);
-                    Log.d(TAG, "Disabling PWM OnePulse: writing " + oneFalse + " to " + onepulseFile);
-                    FileUtils.writeValue(onepulseFile, oneFalse);
-                }
+                    String onepulseFile = getApplicationContext().getString(R.string.node_onepulse_pwm_switch);
+                    if (onepulseFile != null && FileUtils.fileWritable(onepulseFile)) {
+                        String oneFalse = getApplicationContext().getString(R.string.node_onepulse_pwm_switch_false);
+                        Log.d(TAG, "Disabling PWM OnePulse: writing " + oneFalse + " to " + onepulseFile);
+                        FileUtils.writeValue(onepulseFile, oneFalse);
+                    }
 
-                // Save current min/peak refresh rates so we can restore them later
-                boolean hasSaved = mSharedPrefs.getBoolean(PREF_HAS_SAVED_RATES, false);
-                if (!hasSaved) {
-                    float curMin = Settings.System.getFloat(getContentResolver(), Settings.System.MIN_REFRESH_RATE, 60f);
-                    float curPeak = Settings.System.getFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, 60f);
-                    Log.d(TAG, "Saving current refresh rates: min=" + curMin + " peak=" + curPeak);
-                    mSharedPrefs.edit()
-                            .putFloat(PREF_SAVED_MIN_RATE, curMin)
-                            .putFloat(PREF_SAVED_PEAK_RATE, curPeak)
-                            .putBoolean(PREF_HAS_SAVED_RATES, true)
-                            .apply();
-                }
+                    boolean hasSaved = mSharedPrefs.getBoolean(PREF_HAS_SAVED_RATES, false);
+                    if (!hasSaved) {
+                        float curMin = Settings.System.getFloat(getContentResolver(), Settings.System.MIN_REFRESH_RATE, 60f);
+                        float curPeak = Settings.System.getFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, 60f);
+                        Log.d(TAG, "Saving current refresh rates: min=" + curMin + " peak=" + curPeak);
+                        mSharedPrefs.edit()
+                                .putFloat(PREF_SAVED_MIN_RATE, curMin)
+                                .putFloat(PREF_SAVED_PEAK_RATE, curPeak)
+                                .putBoolean(PREF_HAS_SAVED_RATES, true)
+                                .apply();
+                    }
+                    float peak = Settings.System.getFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, 60f);
+                    Log.d(TAG, "Setting refresh rates to peak=" + peak);
+                    Settings.System.putFloat(getContentResolver(), Settings.System.MIN_REFRESH_RATE, peak);
+                    Settings.System.putFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, peak);
+                    Thread.sleep(300);
+                    Log.d(TAG, "Enabling HBM: writing node 1 to " + getFile());
+                    FileUtils.writeValue(getFile(), "1");
 
-                // Read current system peak refresh rate and set both min and peak to it
-                float peak = Settings.System.getFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, 60f);
-                Log.d(TAG, "Setting refresh rates to peak=" + peak);
-                Settings.System.putFloat(getContentResolver(), Settings.System.MIN_REFRESH_RATE, peak);
-                Settings.System.putFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, peak);
-            } catch (Exception e) {
-                Log.d(TAG, "Exception while setting refresh rates: " + e.getMessage());
+                } catch (Exception e) {
+                    Log.d(TAG, "Exception while enabling HBM: " + e.getMessage());
+                }
+            } else {
+                Log.d(TAG, "Disabling HBM: writing node 0 to " + getFile());
+                FileUtils.writeValue(getFile(), "0");
+                Thread.sleep(300);
+                try {
+                    boolean hasSavedMode = mSharedPrefs.getBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false);
+                    if (hasSavedMode) {
+                        int savedMode = mSharedPrefs.getInt(PREF_SAVED_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+                        Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, savedMode);
+                        mSharedPrefs.edit().putBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false).apply();
+                        Log.d(TAG, "Restored automatic brightness mode=" + savedMode);
+                    }
+
+                    boolean hasSaved = mSharedPrefs.getBoolean(PREF_HAS_SAVED_RATES, false);
+                    if (hasSaved) {
+                        float savedMin = mSharedPrefs.getFloat(PREF_SAVED_MIN_RATE, 60f);
+                        float savedPeak = mSharedPrefs.getFloat(PREF_SAVED_PEAK_RATE, 60f);
+                        Log.d(TAG, "Restoring saved refresh rates: min=" + savedMin + " peak=" + savedPeak);
+                        Settings.System.putFloat(getContentResolver(), Settings.System.MIN_REFRESH_RATE, savedMin);
+                        Settings.System.putFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, savedPeak);
+                        mSharedPrefs.edit().putBoolean(PREF_HAS_SAVED_RATES, false).apply();
+                        Log.d(TAG, "Cleared saved refresh rates flag");
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "Exception while restoring settings: " + e.getMessage());
+                }
             }
-        } else {
-            Log.d(TAG, "Disabling HBM: writing node 0 to " + getFile());
-            FileUtils.writeValue(getFile(), "0");
-            try {
-                // onepulse state intentionally not restored
-                // Restore automatic brightness mode if we saved it earlier
-                boolean hasSavedMode = mSharedPrefs.getBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false);
-                if (hasSavedMode) {
-                    int savedMode = mSharedPrefs.getInt(PREF_SAVED_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                    Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE, savedMode);
-                    mSharedPrefs.edit().putBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false).apply();
-                    Log.d(TAG, "Restored automatic brightness mode=" + savedMode);
-                }
-
-                // Restore previously saved min/peak refresh rates if we saved them
-                boolean hasSaved = mSharedPrefs.getBoolean(PREF_HAS_SAVED_RATES, false);
-                if (hasSaved) {
-                    float savedMin = mSharedPrefs.getFloat(PREF_SAVED_MIN_RATE, 60f);
-                    float savedPeak = mSharedPrefs.getFloat(PREF_SAVED_PEAK_RATE, 60f);
-                    Log.d(TAG, "Restoring saved refresh rates: min=" + savedMin + " peak=" + savedPeak);
-                    Settings.System.putFloat(getContentResolver(), Settings.System.MIN_REFRESH_RATE, savedMin);
-                    Settings.System.putFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, savedPeak);
-                    // Clear saved flag
-                    mSharedPrefs.edit().putBoolean(PREF_HAS_SAVED_RATES, false).apply();
-                    Log.d(TAG, "Cleared saved refresh rates flag");
-                }
-            } catch (Exception e) {
-                Log.d(TAG, "Exception while restoring refresh rates: " + e.getMessage());
-            }
-        }
+        });
     }
 
     private boolean isCurrentlyEnabled() {
