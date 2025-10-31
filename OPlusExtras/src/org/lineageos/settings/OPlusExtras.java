@@ -66,8 +66,8 @@ public class OPlusExtras extends PreferenceFragment
     public static final String KEY_AUTO_HBM_THRESHOLD = "auto_hbm_threshold";
     public static final String KEY_HBM_INFO = "hbm_info";
     private static TwoStatePreference mDCModeSwitch;
-    private static TwoStatePreference mOnePulsePWMSwitch;
-    private static TwoStatePreference mAutoHBMSwitch;
+    public static TwoStatePreference mOnePulsePWMSwitch;
+    public static TwoStatePreference mAutoHBMSwitch;
     private Preference mHBMInfo;
 
     public static final String KEY_CATEGORY_CPU = "cpu";

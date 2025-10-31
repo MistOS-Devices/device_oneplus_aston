@@ -12,6 +12,9 @@ import androidx.preference.Preference.OnPreferenceChangeListener;
 
 import org.lineageos.settings.FileUtils;
 import org.lineageos.settings.R;
+import android.os.Handler;
+import android.os.Looper;
+import org.lineageos.settings.OPlusExtras;
 
 public class OnePulsePWMSwitch implements OnPreferenceChangeListener {
 
@@ -39,6 +42,12 @@ public class OnePulsePWMSwitch implements OnPreferenceChangeListener {
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         Boolean enabled = (Boolean) newValue;
         FileUtils.writeValue(getFile(preference.getContext()), enabled ? "1" : "0");
+        Handler h = new Handler(Looper.getMainLooper());
+        h.post(() -> {
+            if (OPlusExtras.mAutoHBMSwitch != null) {
+                OPlusExtras.mAutoHBMSwitch.setChecked(!enabled);
+            }
+        });
         return true;
     }
 }
