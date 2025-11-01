@@ -226,7 +226,7 @@ public class OPlusExtras extends PreferenceFragment
                         toastText = "Never gonna give you up!";
                     }
 
-                    Toast.makeText(getContext(), toastText, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), toastText, Toast.LENGTH_SHORT).show();
                     Intent rickRollIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     
                     try {
