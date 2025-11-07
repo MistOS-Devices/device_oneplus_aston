@@ -79,6 +79,7 @@ PRODUCT_SOONG_NAMESPACES += \
 
 # Telephony
 PRODUCT_PACKAGES += \
+    OplusEsimSwitcher \
     OplusEuicc
 
 PRODUCT_COPY_FILES += \
