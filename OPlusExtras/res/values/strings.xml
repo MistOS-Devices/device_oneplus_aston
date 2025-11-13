@@ -171,6 +171,10 @@
     <string name="usb2_fc_summary">Force fast charging of up to 900mA in USB 2.0 mode</string>
     <string name="usb2_fc_warning">Interferes with dash/warp charging; only enable when applicable</string>
 
+    <!-- AOD Brightness -->
+    <string name="aod_brightness_title">Higher AOD Brightness</string>
+    <string name="aod_brightness_summary">Whether to use higher brightness for AOD</string>
+
     <!-- Audio -->
     <string name="category_audio">Audio</string>
 

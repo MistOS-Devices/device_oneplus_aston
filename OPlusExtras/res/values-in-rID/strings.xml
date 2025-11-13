@@ -126,6 +126,9 @@
     <string name="usb2_fc_title">Pengisian cepat USB 2.0</string>
     <string name="usb2_fc_summary">Paksa pengisian cepat hingga 900mA dalam mode USB 2.0</string>
     <string name="usb2_fc_warning">Mengganggu pengisian dash/warp; hanya aktifkan jika berlaku</string>
+    <!-- AOD Brightness -->
+    <string name="aod_brightness_title">Kecerahan AOD Lebih Tinggi</string>
+    <string name="aod_brightness_summary">Gunakan kecerahan yang lebih tinggi untuk Always-On Display</string>
     <!-- Vibrator -->
     <string name="category_vibrator">Penggetar</string>
     <string name="vib_strength_title">Kekuatan Sistem</string>

@@ -77,6 +77,10 @@ public class Startup extends BroadcastReceiver {
         if (enabled) {
             restore(OTGModeSwitch.getFile(context), enabled);
         }
+        enabled = sharedPrefs.getBoolean(OPlusExtras.KEY_AOD_BRIGHTNESS_SWITCH, false);
+        if (enabled) {
+            restore(org.lineageos.settings.modeswitch.AODBrightnessSwitch.getFile(context), enabled);
+        }
         enabled = sharedPrefs.getBoolean(OPlusExtras.KEY_USB2_SWITCH, false);
         if (enabled) {
             restore(USB2FastChargeModeSwitch.getFile(context), enabled);

@@ -171,6 +171,10 @@
     <string name="usb2_fc_summary">在 USB 2.0 模式下强制进行高达 900mA 的快速充电</string>
     <string name="usb2_fc_warning">干扰 Dash / Warp 闪充；仅在适用时启用</string>
 
+    <!-- AOD Brightness -->
+    <string name="aod_brightness_title">更高的 AOD 亮度</string>
+    <string name="aod_brightness_summary">是否为常显显示使用更高亮度</string>
+
     <!-- Audio -->
     <string name="category_audio">音效</string>
 

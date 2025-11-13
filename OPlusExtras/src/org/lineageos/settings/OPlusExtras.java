@@ -71,6 +71,8 @@ public class OPlusExtras extends PreferenceFragment
     private static TwoStatePreference mDCModeSwitch;
     public static TwoStatePreference mOnePulsePWMSwitch;
     public static TwoStatePreference mAutoHBMSwitch;
+    public static final String KEY_AOD_BRIGHTNESS_SWITCH = "aod_brightness";
+    private static TwoStatePreference mAODBrightnessSwitch;
     private Preference mHBMInfo;
     private int mHBMInfoClickCount = 0;
     private long mLastHBMInfoClickTime = 0;
@@ -257,6 +259,17 @@ public class OPlusExtras extends PreferenceFragment
             findPreference(KEY_AUTO_HBM_SWITCH).setVisible(false);
             findPreference(KEY_AUTO_HBM_THRESHOLD).setVisible(false);
             findPreference(KEY_HBM_INFO).setVisible(false);
+        }
+
+        // AOD Brightness
+        displayCategory = displayCategory | isFeatureSupported(context, R.bool.config_deviceSupportsAODBrightness);
+        if (isFeatureSupported(context, R.bool.config_deviceSupportsAODBrightness)) {
+            mAODBrightnessSwitch = (TwoStatePreference) findPreference(KEY_AOD_BRIGHTNESS_SWITCH);
+            mAODBrightnessSwitch.setEnabled(org.lineageos.settings.modeswitch.AODBrightnessSwitch.isSupported(this.getContext()));
+            mAODBrightnessSwitch.setChecked(org.lineageos.settings.modeswitch.AODBrightnessSwitch.isCurrentlyEnabled(this.getContext()));
+            mAODBrightnessSwitch.setOnPreferenceChangeListener(new org.lineageos.settings.modeswitch.AODBrightnessSwitch());
+        } else {
+            findPreference(KEY_AOD_BRIGHTNESS_SWITCH).setVisible(false);
         }
 
         if (!displayCategory) {

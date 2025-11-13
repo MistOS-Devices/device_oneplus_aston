@@ -93,6 +93,11 @@
             android:summary="@string/onepulse_pwm_mode_summary" />
 
         <SwitchPreferenceCompat
+            android:key="aod_brightness"
+            android:title="@string/aod_brightness_title"
+            android:summary="@string/aod_brightness_summary" />
+
+        <SwitchPreferenceCompat
             android:key="auto_hbm"
             android:title="@string/auto_hbm_title"
             android:summary="@string/auto_hbm_summary" />
