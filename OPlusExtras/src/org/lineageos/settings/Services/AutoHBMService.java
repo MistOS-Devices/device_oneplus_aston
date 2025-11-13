@@ -105,7 +105,11 @@ public class AutoHBMService extends Service {
                     Log.d(TAG, "Setting refresh rates to peak=" + peak);
                     Settings.System.putFloat(getContentResolver(), Settings.System.MIN_REFRESH_RATE, peak);
                     Settings.System.putFloat(getContentResolver(), Settings.System.PEAK_REFRESH_RATE, peak);
-                    Thread.sleep(300);
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
                     Log.d(TAG, "Enabling HBM: writing node 1 to " + getFile());
                     FileUtils.writeValue(getFile(), "1");
 
@@ -115,7 +119,11 @@ public class AutoHBMService extends Service {
             } else {
                 Log.d(TAG, "Disabling HBM: writing node 0 to " + getFile());
                 FileUtils.writeValue(getFile(), "0");
-                Thread.sleep(300);
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
                 try {
                     boolean hasSavedMode = mSharedPrefs.getBoolean(PREF_HAS_SAVED_BRIGHTNESS_MODE, false);
                     if (hasSavedMode) {
