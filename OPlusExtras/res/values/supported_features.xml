@@ -18,7 +18,7 @@
     <bool name="config_deviceSupportsDCdimming">false</bool>
 
     <!-- Whether device supports One Pulse PWM -->
-    <bool name="config_deviceSupportsOnePulsePWM">true</bool>
+    <bool name="config_deviceSupportsOnePulsePWM">false</bool>
 
     <!-- Whether device supports High Brightness Mode -->
     <bool name="config_deviceSupportsHBM">true</bool>
